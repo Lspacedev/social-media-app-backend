@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  email String @unique
+  password String
+  joined  DateTime @default(now())
+  followedBy Follows[] @relation("followedBy")
+  following  Follows[] @relation("following")
+  posts Post[]
+  comments Comment[]
+  likes Like[]
+  notifications Notification []
+  sentMessages Message[] @relation("sentMessages")
+  recievedMessages Message[] @relation("receivedMessages")
+  profileUrl String?
+  coverUrl String?
+
+
+}
+
+model Follows {
+  followedBy   User @relation("followedBy", fields: [followedById], references: [id])
+  followedById Int
+  following    User @relation("following", fields: [followingId], references: [id])
+  followingId  Int
+
+  @@id([followingId, followedById])
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  text String?
+  imageUrl String?
+  timestamp  DateTime @default(now())
+  comments Comment[]
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int 
+  likes Like[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  commentText String
+  timestamp  DateTime @default(now())
+  post Post @relation(fields: [postId], references: [id])
+  postId Int
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+}
+
+model Like {
+  id  String   @id @default(cuid())
+  likedBy User  @relation(fields: [likedById], references: [id])
+  likedById Int
+  post Post @relation(fields: [postId], references: [id])
+  postId Int
+  createdAt DateTime @default(now())
+  @@unique([likedById, postId]) 
+}
+model Message {
+  id Int @id @default(autoincrement())
+  timestamp  DateTime @default(now())
+  replies Reply[]
+  sender     User   @relation(name: "sentMessages", fields: [senderId], references: [id])
+  receiver   User   @relation(name: "receivedMessages", fields: [receiverId], references: [id])
+  senderId   Int 
+  receiverId Int
+  senderUsername String?
+  receiverUsername String?
+   
+}
+
+model Reply {
+  id Int @id @default(autoincrement())
+  text String
+  message Message @relation(fields: [messageId], references: [id])
+  messageId Int 
+  timestamp  DateTime @default(now()) 
+  authorId Int 
+  
+}
+model Notification {
+  id Int @id @default(autoincrement())
+  message String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  timestamp  DateTime @default(now())
+
+
+}
