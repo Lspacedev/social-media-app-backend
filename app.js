@@ -18,6 +18,7 @@ const io = socketIo(server, {
     methods: ["GET", "POST", "PUT"],
     credentials: true,
   },
+  wsEngine: "ws",
 });
 app.use((req, res, next) => {
   req.io = io;
