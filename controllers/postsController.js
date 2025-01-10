@@ -458,6 +458,8 @@ async function deleteComment(req, res) {
 
 async function likePost(req, res) {
   try {
+    req.io.emit("test", { con: true });
+
     const { userId, postId } = req.params;
     const findLike = await prisma.like.findUnique({
       where: {
@@ -482,6 +484,14 @@ async function likePost(req, res) {
           },
         },
       });
+      const feedPosts = await prisma.post.findMany({
+        include: {
+          comments: true,
+          likes: true,
+        },
+      });
+      req.io.emit("feed-likes-updated", feedPosts);
+
       const post = await prisma.post.findUnique({
         where: {
           id: Number(postId),
@@ -509,12 +519,7 @@ async function likePost(req, res) {
           likes: true,
         },
       });
-      const feedPosts = await prisma.post.findMany({
-        include: {
-          comments: true,
-          likes: true,
-        },
-      });
+
       const likedPosts = await prisma.like.findMany({
         where: {
           likedById: req.user.id,
@@ -606,7 +611,6 @@ async function likePost(req, res) {
         });
         req.io.emit("notifications-updated", user);
       }
-      req.io.emit("feed-likes-updated", feedPosts);
       req.io.emit("following-likes-updated", followingPosts);
 
       req.io.emit("profile-likes-updated", profilePosts);
@@ -645,6 +649,14 @@ async function unlikePost(req, res) {
           },
         },
       });
+      const feedPosts = await prisma.post.findMany({
+        include: {
+          comments: true,
+          likes: true,
+        },
+      });
+      req.io.emit("feed-likes-updated", feedPosts);
+
       const post = await prisma.post.findUnique({
         where: {
           id: Number(postId),
@@ -672,12 +684,7 @@ async function unlikePost(req, res) {
           likes: true,
         },
       });
-      const feedPosts = await prisma.post.findMany({
-        include: {
-          comments: true,
-          likes: true,
-        },
-      });
+
       const likedPosts = await prisma.like.findMany({
         where: {
           likedById: req.user.id,
@@ -733,7 +740,6 @@ async function unlikePost(req, res) {
           followingPosts = followingPosts.concat(arr);
         })
       );
-      req.io.emit("feed-likes-updated", feedPosts);
       req.io.emit("following-likes-updated", followingPosts);
 
       req.io.emit("profile-likes-updated", profilePosts);

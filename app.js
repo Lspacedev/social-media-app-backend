@@ -12,7 +12,26 @@ const postsRouter = require("./routes/postsRouter");
 
 const server = http.createServer(app);
 
-const io = socketIo(server, { cors: { origin: "*", credentials: true } });
+const io = socketIo(server, {
+  transports: ["polling"],
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("A user is connected");
+
+  socket.on("error", (error) => {
+    console.log(`${error}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`socket ${socket.id} disconnected`);
+  });
+});
 app.use((req, res, next) => {
   req.io = io;
   return next();
