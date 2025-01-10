@@ -15,10 +15,12 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST", "PUT"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
-  wsEngine: "ws",
+});
+io.on("connect_error", (err) => {
+  console.log(`connect_error due to ${err.message}`);
 });
 app.use((req, res, next) => {
   req.io = io;
