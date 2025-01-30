@@ -8,7 +8,6 @@ const upload = multer({ storage: storage });
 
 // Custom file upload middleware
 const uploadMiddleware = (req, res, next) => {
-  console.log("dskf", req.files);
   upload.array("image", 2)(req, res, (err) => {
     if (err) {
       console.log({ err });

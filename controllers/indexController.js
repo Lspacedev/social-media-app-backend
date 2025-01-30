@@ -128,14 +128,17 @@ async function postGuestLoginForm(req, res) {
     let { username, password } = req.body;
     const user = await prisma.user.findUnique({
       where: {
-        username: "Guest",
+        username: process.env.GUEST_USERNAME,
       },
     });
 
     if (!user) {
       return res.status(401).json({ errors: ["Incorrect username"] });
     }
-    const match = await bcrypt.compare("guestuser", user.password);
+    const match = await bcrypt.compare(
+      process.env.GUEST_PASSWORD,
+      user.password
+    );
     if (!match) {
       // passwords do not match!
       return res.status(401).json({ errors: ["Incorrect password"] });

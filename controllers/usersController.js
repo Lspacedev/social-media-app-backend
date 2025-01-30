@@ -70,7 +70,6 @@ const updateUser = [
         errors: errors.array(),
       });
     }
-    console.log(req.files);
     try {
       const reqUser = req.user;
       const { username } = req.body;
@@ -374,7 +373,6 @@ async function follow(req, res) {
   try {
     // user's following
     const { userId } = req.params;
-    console.log(userId, req.user.id);
     const user = await prisma.user.findUnique({
       where: {
         id: req.user.id,
@@ -707,7 +705,6 @@ async function getMessageById(req, res) {
   }
 }
 async function postReplyToMessage(req, res) {
-  console.log(req.body);
   try {
     // user's friends
     const user = req.user;
@@ -744,7 +741,6 @@ async function postReplyToMessage(req, res) {
 async function deleteNotification(req, res) {
   try {
     const { userId, notificationId } = req.params;
-    console.log({ userId, notificationId });
 
     const notificationDelete = await prisma.notification.delete({
       where: {

@@ -67,8 +67,6 @@ const createPost = [
     }
 
     try {
-      console.log(req.file);
-
       const { userId } = req.params;
 
       const { text } = req.body;
@@ -151,8 +149,6 @@ const updatePost = [
     }
 
     try {
-      console.log(req.file);
-
       const { postId } = req.params;
       const { text } = req.body;
       const post = await prisma.post.findUnique({
@@ -314,7 +310,6 @@ const addComment = [
       });
     }
     const { userId, postId } = req.params;
-    console.log(userId, req.user.id);
     const { commentText } = req.body;
     //return all pub & unpub posts from author
     const comment = await prisma.comment.create({
